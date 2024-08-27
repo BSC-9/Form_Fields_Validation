@@ -35,11 +35,17 @@ const Form = () => {
     });
   };
 
+  const isValidDate = (day, month, year) => {
+    const monthDays = [31, (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    return day > 0 && day <= monthDays[month - 1];
+  };
+
   const check = (para) => {
     para.preventDefault();
 
     const { firstName, lastName, DOB, Address, State, City } = formData;
     const currentYear = new Date().getFullYear();
+    const currentDate = new Date();
 
     if (firstName.length <= 1 || !/^[A-Za-z\s]+$/.test(firstName)) {
       alert("First name should be more than 1 character and contain only alphabetic characters and spaces.");
@@ -52,17 +58,20 @@ const Form = () => {
     }
 
     const dobPattern = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
-    const isValidDate = dobPattern.test(DOB);
+    const isValidDOB = dobPattern.test(DOB);
 
-    if (isValidDate) {
+    if (isValidDOB) {
       const [day, month, year] = DOB.split('/').map(Number);
-      const isDayValid = day >= 1 && day <= 31;
-      const isMonthValid = month >= 1 && month <= 12;
-      const isYearValid = year < currentYear;
-      const isAgeValid = (currentYear - year) >= 18;
+      const birthDate = new Date(year, month - 1, day);
+      const isAgeValid = currentYear - year > 17 || (currentYear - year === 17 && currentDate >= birthDate);
 
-      if (!(isDayValid && isMonthValid && isYearValid && isAgeValid)) {
-        alert("Date of birth should be valid and the user should be more than 18 years old.");
+      if (!isAgeValid) {
+        alert("User should be more than 17 years old.");
+        return;
+      }
+
+      if (!isValidDate(day, month, year)) {
+        alert(`Invalid date. The month ${month} doesn't have ${day} days.`);
         return;
       }
     } else {
@@ -70,18 +79,18 @@ const Form = () => {
       return;
     }
 
-    if (!/^[a-zA-Z0-9\s,]+$/.test(Address)) {
-      alert("Address should contain only numbers, alphabets, commas, and spaces.");
+    if (!/^[a-zA-Z0-9\s,/-]+$/.test(Address)) {
+      alert("Address should contain only numbers, alphabets, commas, spaces, /, and -.");
       return;
     }
 
-    if (!/^[A-Za-z\s]+$/.test(State)) {
-      alert("State should contain only alphabetic characters.");
+    if (State.length <= 1 || !/^[A-Za-z\s]+$/.test(State)) {
+      alert("State should be more than 1 character and contain only alphabetic characters.");
       return;
     }
 
-    if (!/^[A-Za-z\s]+$/.test(City)) {
-      alert("City should contain only alphabetic characters.");
+    if (City.length <= 1 || !/^[A-Za-z\s]+$/.test(City)) {
+      alert("City should be more than 1 character and contain only alphabetic characters.");
       return;
     }
 
