@@ -62,6 +62,11 @@ const Form = () => {
 
     if (isValidDOB) {
       const [day, month, year] = DOB.split('/').map(Number);
+      if (!isValidDate(day, month, year)) {
+        alert(`Invalid date. The month ${month} doesn't have ${day} days.`);
+        return;
+      }
+
       const birthDate = new Date(year, month - 1, day);
       const isAgeValid = currentYear - year > 17 || (currentYear - year === 17 && currentDate >= birthDate);
 
@@ -69,18 +74,14 @@ const Form = () => {
         alert("User should be more than 17 years old.");
         return;
       }
-
-      if (!isValidDate(day, month, year)) {
-        alert(`Invalid date. The month ${month} doesn't have ${day} days.`);
-        return;
-      }
     } else {
       alert("Date of birth should be in the format dd/mm/yyyy.");
       return;
     }
 
-    if (!/^[a-zA-Z0-9\s,/-]+$/.test(Address)) {
-      alert("Address should contain only numbers, alphabets, commas, spaces, /, and -.");
+    // Updated Address validation to ensure it contains letters and numbers
+    if (!/^[a-zA-Z0-9\s,/-]+$/.test(Address) || !/[a-zA-Z0-9]/.test(Address)) {
+      alert("Address should contain at least one letter or number, and can include commas, spaces, /, and -.");
       return;
     }
 
